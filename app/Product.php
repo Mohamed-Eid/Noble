@@ -144,7 +144,7 @@ class Product extends Model
                 0 => 'Inactive',
                 1 => 'Active',
             ]
-        ][app()->getLocale()][$val];
+        ][app()->getLocale()][1];
     }
     
     

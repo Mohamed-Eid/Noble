@@ -3,21 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Cart;
-use App\Color;
 use App\Coupon;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\DelivertimeResource;
-use App\Events\NewProductHasOrdered;
 use App\Order;
 use App\Product;
-use App\Member;
 use App\Subdetail;
 use App\Deliverytime;
 use App\Http\Resources\ShoppingCartResource;
-use App\Mail\OrderMail;
 use App\ShoppingCart;
 use App\Size;
 use Illuminate\Support\Facades\Mail;
@@ -35,7 +30,9 @@ class OrderController extends Controller
     private function get_sub_details($ids)
     {
         $subdetails = [];
+
         foreach ($ids as $id) {
+        
             $subdetail = Subdetail::find($id);
             if(!$subdetail)
             {
@@ -68,7 +65,11 @@ class OrderController extends Controller
         return $data;
     }
 
-    public function add_to_cart()
+    public function add_to_cart(){
+        return request()->all();
+    }
+
+    public function add_to_cart_old()
     {
         $client = request()->client;
 
@@ -222,7 +223,7 @@ class OrderController extends Controller
 
     }
     
-    public function checkout()
+    public function checkout_old()
     {
         $client = request()->client;
         $validate = Validator::make(request()->all(),[
@@ -276,6 +277,123 @@ class OrderController extends Controller
             foreach ($carts as $cart) {
                 $cart->delete();
             }
+            
+            $this->send_mails_to_admins($order);
+            
+            return $this->ApiResponse(true , [] , __('api.ordered') , $order ,200);
+        }
+        
+        return $this->ApiResponse(true , [__('api.backend_error')] , __('api.backend_error') , [] ,200);
+    }
+
+
+
+    private function calc_price_on_cart($items){
+
+        $total_price = 0;
+        foreach ($items as $item) {
+            $size_cost = 0;
+
+            $product = Product::find($item['product_id']);
+        
+            if(!$product)
+            {
+                return $this->ApiResponse(true , [__('api.product_not_found')] , __('api.product_not_found') , [] ,200);
+            }
+
+            if($item['size_id'] && $item['size_id']!=0)
+            {
+                $size  = Size::find($item['size_id']);
+                
+                if(!$size)
+                {
+                    return $this->ApiResponse(true , [__('api.size_not_found')] , __('api.size_not_found') , [] ,200);
+                }
+
+                $size_cost = ($size->cost - ($product->discount/100*$size->cost));
+            }
+
+            $quantity = $item['quantity'];
+            
+            $special_sizes = $item['special_sizes'] ?? null;
+            $special_sizes_cost = 0;
+
+            if($special_sizes != null)
+            {
+                //check if product have special sizes
+                $special_sizes_cost = ($special_sizes['length'] /100 * $product->length_cost) +
+                        ($special_sizes['width']  /100 * $product->width_cost)  +
+                        ($special_sizes['height'] /100 * $product->height_cost) + 
+                        ($special_sizes['depth']  /100 * $product->depth_cost);
+            }
+
+            $sub_details = $this->get_sub_details($item['sub_details']);
+
+            $sub_details_price = $this->find_subdetails_cost($sub_details);
+
+            $price = ($size_cost + $sub_details_price + $special_sizes_cost)*$quantity;
+
+            $total_price += $price;
+        }
+        return ($total_price);
+    }
+
+    public function checkout()
+    {
+        $client = request()->client;
+        
+        $validate = Validator::make(request()->all(),[
+            'location' => 'required',
+            'items'    => 'required|array|min:1',
+            'payment_method' => 'required'
+        ]);
+        
+        if($validate->fails())
+        {
+            return $this->ApiResponse(true , $validate->errors()->all() , __('api.validation_error') , [] ,200);
+        }
+
+
+        $total_cost =  0 ; //+ $client->district->delivered_cost //calc tax
+        
+        $items = request()->items;
+        
+        //return $items;
+
+        
+        $total_cost += $this->calc_price_on_cart($items);
+
+       // return ($carts);
+        
+        $coupon = null;
+        if(request()->coupon)
+        {
+            $coupon = Coupon::where('coupon',request()->coupon)->first();
+
+            if($coupon && $coupon->expire_date >= date('Y-m-d'))
+            {
+                $total_cost -= $total_cost * ($coupon->offer/100);
+            }
+        }
+
+        $order = $client->orders()->create([
+            'carts' => $items,
+            'notes' => request()->notes,
+            'status' => 1,
+            'location' => request()->location,
+            'payment_method' => request()->payment_method,
+            'total_price'   => $total_cost,
+            'discount' => $coupon == null ? 0 : $coupon->offer.' %',     
+        ]);
+
+        return $this->ApiResponse(true , [] , __('api.ordered') , $order ,200);
+
+        if($order)
+        {      
+            foreach ($items as $item) {
+                $product = Product::find( $item['product_id'])->orders += 1;
+                $product->save();
+            }  
             
             $this->send_mails_to_admins($order);
             

@@ -28,20 +28,10 @@ Route::group(
         Route::prefix('api')->name('api.')->middleware(['api'])->group(function(){
             //Route::get('test','ClientController@get_client');
 
-            Route::post('test',function(){
-                //return(request()->all());
-                $cart = request()->cart;
 
-                $total_price = 0;
-                $items_count = 0;
-                foreach ($cart['items'] as $key => $item) {
-                    //get subdetails price
-                    $items_count++;
-                }
+            Route::post('create_un_complete_user','ClientController@create_un_complete_user');
 
-                return $items_count;
-            });
-
+            Route::put('update_un_complete_user','ClientController@update_un_complete_user')->middleware('authorizeclient');
 
             Route::group(['prefix' => 'clients'], function () {
                 Route::post('register','ClientController@register_client');
@@ -94,22 +84,22 @@ Route::group(
                 
                 Route::get('bycountry/{id}','ProductController@get_all_by_city_id');
                 Route::get('byuserselection','ProductController@get_all_by_user_selection')->middleware('authorizeclient');
-                Route::get('/{product}','ProductController@get_one')->middleware('authorizeclient');
+                Route::get('/{product}','ProductController@get_one');
                 Route::get('/{product}/page','ProductController@product_page')->middleware('authorizeclient');;
             });
             
             
 
-            Route::group(['prefix' => 'orders', 'middleware' => ['authorizeclient']], function () {
-                Route::get('order_page' , 'OrderController@order_page');
+            Route::group(['prefix' => 'orders'], function () {
+                Route::get('order_page' , 'OrderController@order_page')->middleware('authorizeclient');
                 Route::post('add_to_cart','OrderController@add_to_cart');
-                Route::get('myorders','OrderController@get_client_orders');
-                Route::get('myorders/{order}','OrderController@get_client_order_by_id');
-                Route::get('carts','OrderController@carts');
-                Route::post('checkout','OrderController@checkout');
-                Route::post('testcheckout','OrderController@checkout');
-                Route::get('check_coupon','OrderController@check_coupon');
-                Route::delete('delete/{cart}','OrderController@delete_from_cart');
+                Route::get('myorders','OrderController@get_client_orders')->middleware('authorizeclient');
+                Route::get('myorders/{order}','OrderController@get_client_order_by_id')->middleware('authorizeclient');
+                Route::get('carts','OrderController@carts')->middleware('authorizeclient');
+                Route::post('checkout','OrderController@checkout')->middleware('authorizeclient');
+                Route::post('testcheckout','OrderController@checkout')->middleware('authorizeclient');
+                Route::get('check_coupon','OrderController@check_coupon')->middleware('authorizeclient');
+                Route::delete('delete/{cart}','OrderController@delete_from_cart')->middleware('authorizeclient');
             });
             
             Route::get('delivery_times' , 'OrderController@delivery_times');
@@ -122,24 +112,26 @@ Route::group(
 
             Route::group(['prefix' => 'admin'], function () {
                 Route::post('login','AdminController@login');
+
                 Route::get('cc','AdminController@cc')->middleware('authorizedadmin');
+
                 Route::get('orders','AdminController@get_client_orders')->middleware('authorizedadmin');
-                
+
                 Route::get('orders/tabs','AdminController@get_client_orders_by_status')->middleware('authorizedadmin');
 
-                
                 Route::get('orders/{order}','AdminController@get_client_order_by_id')->middleware('authorizedadmin');
 
                 Route::post('orders/{order}','AdminController@change_status')->middleware('authorizedadmin');
-                
+
                 Route::put('update_fcm_token' , 'AdminController@update_token')->middleware('authorizedadmin');
 
             });
-            
+
             Route::get('contact_details','ServiceNumberController@service_number');
 
             Route::get('download',function(){
                 return \App\Download::first();
             });
+
         });//end of api routes
 });

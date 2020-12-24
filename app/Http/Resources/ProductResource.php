@@ -14,13 +14,14 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        $images = ImageResource::collection($this->images);
+        $images = count($this->images) > 0 ? ImageResource::collection($this->images) : [];
         $all_images = [];
+        
         foreach ($images as $image) {
             $all_images[] = $image->image;
         }
         
-        $videos = VideoResource::collection($this->videos);
+        $videos = count($this->videos) > 0 ? VideoResource::collection($this->videos) : [];
         $all_videos = [];
         foreach ($videos as $video) {
             $all_videos[] = $video->video;

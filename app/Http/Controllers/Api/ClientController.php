@@ -22,6 +22,60 @@ class ClientController extends Controller
     use ApiResponseTrait;
 
     
+    public function create_un_complete_user(Request $request){
+        $validate = Validator::make(request()->all(),[
+            'mobile'      => 'required|unique:clients',
+            'email'       => 'required|unique:clients',
+            //'district_id' => 'required',
+        ]);
+
+        if($validate->fails())
+        {
+            return $this->ApiResponse(true , $validate->errors()->all() , __('api.validation_error') , (object)[] ,200);
+        }
+
+        $data = $request->except(['password', 'password_confirmation' ]);
+        //$data['password'] = bcrypt($request->password);
+        $data['active'] = 0;
+
+
+        $client = Client::create($data);
+        if($client)
+        {
+            $client->api_token = str_random(100);
+            $client->save();
+            
+            $this->send_active_code($client);
+            
+            return $this->ApiResponse(true , [] , __('api.client') , new ClientResource($client) ,200);
+        }
+        return $this->ApiResponse(true , [__('api.back_end_error')] , __('api.back_end_error') , (object)[] ,200);
+    }
+
+    public function update_un_complete_user(){
+        $client = request()->client;
+        $rules = [
+            // 'district_id' => 'required',
+            // 'street' => 'required',
+
+            ];
+        $rules += [
+            'mobile' => ['required' ,Rule::unique('clients','mobile')->ignore($client->mobile,'mobile')],
+            'email'  => ['required' ,Rule::unique('clients','email')->ignore($client->email,'email')]
+        ];
+        
+        $validate = Validator::make(request()->all(),$rules);
+
+        if($validate->fails())
+        {
+            return $this->ApiResponse(true , $validate->errors()->all() , __('api.validation_error') , (object)[] ,200);
+        }
+
+        $client->update(request()->all());
+        
+        return $this->ApiResponse(true , [] , __('api.profile') , new ClientResource($client) ,200);
+    } 
+
     public function register_client(Request $request)
     {
         // dd(request()->all());

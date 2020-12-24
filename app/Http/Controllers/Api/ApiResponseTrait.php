@@ -27,32 +27,10 @@ trait ApiResponseTrait{
         return $client;
     }
 
-    // public function get_shopping_cart_items_count()
-    // {
-    //    $count = 0;
-    //    if(request()->client)
-    //    {
-           
-    //        $count = request()->client->shopping_carts->count();
-    //    }
-    //    return $count;
-    // }   
-    
-    // public function get_shopping_cart_items_count_v2()
-    // {
-    //     $count = 0;
-        
-    //     $client = $this->find_client();
-    //     if($client){
-    //        $count = $client->shopping_carts->count();
-    //     }
-
-    //     return $count;
-    // }
 
     public function errors($errors)
     {
-       return $this->status($errors) ? (array)[] : $errors;
+        return $this->status($errors) ? (array)[] : $errors;
     }
 
     public function status($errors)
