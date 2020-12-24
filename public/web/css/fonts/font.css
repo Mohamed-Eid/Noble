@@ -1,0 +1,21 @@
+/*
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+=     00   00 00 00   00 00 00   00 00 00   00 00 00   00 00    =
+=     00   00    00        00    00    00   00    00   00       =
+=     00   00    00      00      00    00   00    00   00       =
+=     00   00    00    00        00    00   00    00   00       =
+=  00 00   00 00 00   00 00 00   00 00 00   00 00 00   00       =
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+*/
+
+/* Regular */
+@font-face {
+    font-family: "JF Flat Regular";
+    src: url('fonts/Font-Regular.ttf');
+    src: url('fonts/Font-Regular.ttf?#iefix') format('embedded-opentype'),
+    url('fonts/Font-Regular.ttf#JF Flat Regular') format('svg'),
+    url('fonts/Font-Regular.ttf') format('ttf'),
+    url('fonts/Font-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

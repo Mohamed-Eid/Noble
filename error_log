@@ -1,0 +1,7 @@
+[19-Aug-2020 17:06:25 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[20-Aug-2020 15:38:46 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[20-Aug-2020 15:38:54 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[26-Aug-2020 23:46:33 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[29-Aug-2020 21:03:09 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[29-Aug-2020 21:03:39 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
+[30-Aug-2020 04:43:18 UTC] PHP Parse error:  syntax error, unexpected '?', expecting variable (T_VARIABLE) in /home/tafsseel/public_html/vendor/zendframework/zend-diactoros/src/functions/marshal_uri_from_sapi.php on line 83
